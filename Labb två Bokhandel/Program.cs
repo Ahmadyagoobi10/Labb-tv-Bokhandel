@@ -90,11 +90,15 @@ namespace Labb_två_Bokhandel
                 return;
             }
 
-            
+
             Console.Write("Språk: ");
             var language = Console.ReadLine();
+
+            
             if (string.IsNullOrWhiteSpace(language))
-                language = "Okänt";
+                language = "Okänt"; 
+
+            
 
             
             decimal price;
