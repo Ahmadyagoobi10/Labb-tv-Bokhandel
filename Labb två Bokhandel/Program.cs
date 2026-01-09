@@ -15,7 +15,7 @@ namespace Labb_två_Bokhandel
 
             while (running)
             {
-                Console.WriteLine(" Bokhandel App ");
+                Console.WriteLine(" === Bokhandel App === ");
                 Console.WriteLine("1. Lista alla böcker");
                 Console.WriteLine("2. Lägg till ny bok");
                 Console.WriteLine("3. Ändra boktitel");
@@ -281,3 +281,4 @@ namespace Labb_två_Bokhandel
         }
     }
 }
+
