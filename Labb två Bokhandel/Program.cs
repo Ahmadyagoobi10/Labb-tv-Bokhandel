@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Labb_två_Bokhandel
 {
@@ -73,7 +74,7 @@ namespace Labb_två_Bokhandel
                 var authors = book.Authors.Any()
                     ? string.Join(", ", book.Authors.Select(a => a.FirstName + " " + a.LastName))
                     : "Ingen författare";
-                Console.WriteLine($"Titel: {book.Title}, ISBN: {book.Isbn13}");
+                Console.WriteLine($"Titel: {book.Title}, ISBN: {book.Isbn13}, Språk: {book.Language}, Pris: {book.Price:C}");
             }
         }
 
@@ -81,7 +82,7 @@ namespace Labb_två_Bokhandel
         {
             Console.WriteLine("=== Lägg till ny bok ===");
 
-            
+            // Titel
             Console.Write("Titel: ");
             var title = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(title))
@@ -90,31 +91,38 @@ namespace Labb_två_Bokhandel
                 return;
             }
 
+            // Språk
+            string language;
+            while (true)
+            {
+                Console.Write("Språk: ");
+                language = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(language))
+                {
+                    language = "Okänt";
+                    break;
+                }
+                // Endast bokstäver, mellanslag eller bindestreck tillåtet
+                if (Regex.IsMatch(language, @"^[A-Za-zåäöÅÄÖ\s-]+$"))
+                    break;
+                Console.WriteLine("Fel! Språk får bara innehålla bokstäver.");
+            }
 
-            Console.Write("Språk: ");
-            var language = Console.ReadLine();
-
-            
-            if (string.IsNullOrWhiteSpace(language))
-                language = "Okänt"; 
-
-            
-
-            
+            // Pris
             decimal price;
             while (true)
             {
-                Console.Write("Pris: (t.ex. 199.90): ");
-                var input = Console.ReadLine();
+                Console.Write("Pris (t.ex. 199 eller 199.90): ");
+                var input = Console.ReadLine()?.Replace(',', '.');
 
-                if (decimal.TryParse(input, NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
-                         CultureInfo.InvariantCulture, out price))
-                {
+                if (decimal.TryParse(input, NumberStyles.Number, CultureInfo.InvariantCulture, out price) &&
+                    price > 0 && price <= 9999.99m)
                     break;
-                }
+
+                Console.WriteLine("Fel! Ange ett giltigt pris mellan 0 och 9999.99");
             }
 
-            
+            // Utgivningsdatum
             DateOnly publishDate;
             while (true)
             {
@@ -125,7 +133,7 @@ namespace Labb_två_Bokhandel
                 Console.WriteLine("Ange ett giltigt datum (yyyy-mm-dd).");
             }
 
-           
+            // Författare
             var authors = db.Authors.OrderBy(a => a.LastName).ToList();
             if (!authors.Any())
             {
@@ -151,10 +159,10 @@ namespace Labb_två_Bokhandel
 
             var selectedAuthor = authors[authorChoice - 1];
 
-           
+            // Skapa ny bok
             var newBook = new Book
             {
-                Isbn13 = DateTime.Now.Ticks.ToString().Substring(0, 13), 
+                Isbn13 = DateTime.Now.Ticks.ToString().Substring(0, 13),
                 Title = title,
                 Language = language,
                 Price = price,
@@ -162,7 +170,6 @@ namespace Labb_två_Bokhandel
             };
 
             newBook.Authors.Add(selectedAuthor);
-
             db.Books.Add(newBook);
             db.SaveChanges();
 
@@ -211,72 +218,63 @@ namespace Labb_två_Bokhandel
                 Console.WriteLine("Titeln uppdaterades inte.");
             }
         }
-    static void DeleteBook(BokhandelContext db)
-    {
-        var books = db.Books
-            .Include(b => b.Authors)
-            .Include(b => b.Inventories)
-            .Include(b => b.OrderDetails)
-            .OrderBy(b => b.Title)
-            .ToList();
 
-        if (!books.Any())
+        static void DeleteBook(BokhandelContext db)
         {
-            Console.WriteLine("Ingen bok finns att ta bort.");
-            return;
+            var books = db.Books
+                .Include(b => b.Authors)
+                .Include(b => b.Inventories)
+                .Include(b => b.OrderDetails)
+                .OrderBy(b => b.Title)
+                .ToList();
+
+            if (!books.Any())
+            {
+                Console.WriteLine("Ingen bok finns att ta bort.");
+                return;
+            }
+
+            Console.WriteLine("Välj bok att ta bort:");
+            for (int i = 0; i < books.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {books[i].Title}");
+            }
+
+            int choice;
+            while (true)
+            {
+                Console.Write("Val: ");
+                if (int.TryParse(Console.ReadLine(), out choice) &&
+                    choice >= 1 && choice <= books.Count)
+                    break;
+                Console.WriteLine("Ange ett giltigt nummer.");
+            }
+
+            var book = books[choice - 1];
+
+            if (book.Inventories.Any() || book.OrderDetails.Any())
+            {
+                Console.WriteLine("Boken kan inte tas bort eftersom den används i lager eller orderhistorik.");
+                return;
+            }
+
+            book.Authors.Clear();
+            db.Books.Remove(book);
+
+            try
+            {
+                db.SaveChanges();
+                Console.WriteLine($"Boken '{book.Title}' har tagits bort.");
+            }
+            catch
+            {
+                Console.WriteLine("Boken kunde inte tas bort p.g.a. relationer i databasen.");
+            }
         }
 
-        Console.WriteLine("Välj bok att ta bort:");
-        for (int i = 0; i < books.Count; i++)
-        {
-            Console.WriteLine($"{i + 1}. {books[i].Title}");
-        }
-
-        int choice;
-        while (true)
-        {
-            Console.Write("Val: ");
-            if (int.TryParse(Console.ReadLine(), out choice) &&
-                choice >= 1 && choice <= books.Count)
-                break;
-
-            Console.WriteLine("Ange ett giltigt nummer.");
-        }
-
-        var book = books[choice - 1];
-
-        
-        if (book.Inventories.Any() || book.OrderDetails.Any())
-        {
-            Console.WriteLine(
-                "Boken kan inte tas bort eftersom den används i lager eller orderhistorik."
-            );
-            return;
-        }
-
-        book.Authors.Clear();
-
-        db.Books.Remove(book);
-
-        try
-        {
-            db.SaveChanges();
-            Console.WriteLine($"Boken '{book.Title}' har tagits bort.");
-        }
-        catch
-        {
-            Console.WriteLine(
-                "Boken kunde inte tas bort p.g.a. relationer i databasen."
-            );
-        }
-    }
-
-
-
-    static void ListAuthors(BokhandelContext db)
+        static void ListAuthors(BokhandelContext db)
         {
             var authors = db.Authors.OrderBy(a => a.LastName).ToList();
-
             if (!authors.Any())
             {
                 Console.WriteLine("Inga författare finns.");
@@ -290,4 +288,3 @@ namespace Labb_två_Bokhandel
         }
     }
 }
-
