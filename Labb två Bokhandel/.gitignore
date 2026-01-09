@@ -1,0 +1,33 @@
+﻿# Visual Studio-specifika filer
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+*.pdb
+
+# Build mappar
+bin/
+obj/
+
+# Rider IDE
+.idea/
+
+# OS filer
+Thumbs.db
+.DS_Store
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+
+# Testresultat
+TestResults/
+*.trx
+
+# Publikationsmappar
+publish/
+
+# Lokala miljöer och inställningar
+.env
