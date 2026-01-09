@@ -82,7 +82,7 @@ namespace Labb_två_Bokhandel
         {
             Console.WriteLine("=== Lägg till ny bok ===");
 
-            // Titel
+           
             Console.Write("Titel: ");
             var title = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(title))
@@ -91,7 +91,6 @@ namespace Labb_två_Bokhandel
                 return;
             }
 
-            // Språk
             string language;
             while (true)
             {
@@ -102,13 +101,13 @@ namespace Labb_två_Bokhandel
                     language = "Okänt";
                     break;
                 }
-                // Endast bokstäver, mellanslag eller bindestreck tillåtet
+              
                 if (Regex.IsMatch(language, @"^[A-Za-zåäöÅÄÖ\s-]+$"))
                     break;
                 Console.WriteLine("Fel! Språk får bara innehålla bokstäver.");
             }
 
-            // Pris
+          
             decimal price;
             while (true)
             {
@@ -122,7 +121,7 @@ namespace Labb_två_Bokhandel
                 Console.WriteLine("Fel! Ange ett giltigt pris mellan 0 och 9999.99");
             }
 
-            // Utgivningsdatum
+         
             DateOnly publishDate;
             while (true)
             {
@@ -133,11 +132,11 @@ namespace Labb_två_Bokhandel
                 Console.WriteLine("Ange ett giltigt datum (yyyy-mm-dd).");
             }
 
-            // Författare
+            
             var authors = db.Authors.OrderBy(a => a.LastName).ToList();
             if (!authors.Any())
             {
-                Console.WriteLine("Ingen författare finns i databasen. Lägg till författare först.");
+                Console.WriteLine("Ingen författare finns i databasen. Lägg till författare.");
                 return;
             }
 
@@ -159,7 +158,6 @@ namespace Labb_två_Bokhandel
 
             var selectedAuthor = authors[authorChoice - 1];
 
-            // Skapa ny bok
             var newBook = new Book
             {
                 Isbn13 = DateTime.Now.Ticks.ToString().Substring(0, 13),
