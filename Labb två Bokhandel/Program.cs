@@ -1,6 +1,7 @@
 ﻿using Labb_två_Bokhandel.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Labb_två_Bokhandel
@@ -99,10 +100,14 @@ namespace Labb_två_Bokhandel
             decimal price;
             while (true)
             {
-                Console.Write("Pris: ");
-                if (decimal.TryParse(Console.ReadLine(), out price))
+                Console.Write("Pris: (t.ex. 199.90): ");
+                var input = Console.ReadLine();
+
+                if (decimal.TryParse(input, NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
+                         CultureInfo.InvariantCulture, out price))
+                {
                     break;
-                Console.WriteLine("Ange ett giltigt pris (t.ex. 199.90).");
+                }
             }
 
             
