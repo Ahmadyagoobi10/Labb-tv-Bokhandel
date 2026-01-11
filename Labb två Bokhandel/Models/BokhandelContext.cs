@@ -19,6 +19,8 @@ public partial class BokhandelContext : DbContext
 
     public virtual DbSet<Book> Books { get; set; }
 
+    // Added missing DbSet for resten av modellerna utan används bara för Böker och Författare i Program.cs
+    // OBS : Detta gjordes med hjälp av Scaffold-DbContext kommandot för att generera hela DbContext klassen från en existerande databas
     public virtual DbSet<Customer> Customers { get; set; }
 
     public virtual DbSet<Inventory> Inventories { get; set; }
