@@ -189,7 +189,7 @@ namespace Labb_två_Bokhandel
             Console.WriteLine("Välj bok att uppdatera:");
             for (int i = 0; i < books.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {books[i].Title}");
+                Console.WriteLine($"{i + 1}. {books[i].Title}"); 
             }
 
             int choice;
@@ -276,7 +276,7 @@ namespace Labb_två_Bokhandel
             var authors = db.Authors.OrderBy(a => a.LastName).ToList();
             if (!authors.Any())
             {
-                Console.WriteLine("Inga författare finns.");
+                Console.WriteLine("Inga författare finns.") ; 
                 return;
             }
 
