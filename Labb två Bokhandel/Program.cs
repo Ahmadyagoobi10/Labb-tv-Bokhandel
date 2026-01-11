@@ -23,7 +23,7 @@ namespace Labb_två_Bokhandel
                 Console.WriteLine("3. Ändra boktitel");
                 Console.WriteLine("4. Ta bort bok");
                 Console.WriteLine("5. Lista alla författare");
-                Console.WriteLine("0. Avsluta");
+                Console.WriteLine("0. För Avsluta");
                 Console.Write("Välj ett alternativ: ");
 
                 var input = Console.ReadLine();
@@ -33,21 +33,27 @@ namespace Labb_två_Bokhandel
                     case "1":
                         ListBooks(db);
                         break;
+
                     case "2":
                         AddBook(db);
                         break;
+
                     case "3":
                         UpdateBook(db);
                         break;
+
                     case "4":
                         DeleteBook(db);
                         break;
+
                     case "5":
                         ListAuthors(db);
                         break;
+
                     case "0":
                         running = false;
                         break;
+
                     default:
                         Console.WriteLine("Ogiltigt val. Försök igen.");
                         break;
@@ -172,7 +178,7 @@ namespace Labb_två_Bokhandel
             db.SaveChanges();
 
             Console.WriteLine($"Boken '{title}' har lagts till med författaren {selectedAuthor.FirstName} {selectedAuthor.LastName}.");
-            Console.WriteLine("Tryck på valfri tangent för att fortsätta...");
+            Console.WriteLine("Tryck på valfri tangent för att fortsätta.");
             Console.ReadKey();
         }
 
